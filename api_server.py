@@ -85,7 +85,17 @@ def audio_recorder():
     global is_recording
     log.info("Starting audio recording...")
     try:
+        # List available audio devices and their capabilities
+        devices = sd.query_devices()
+        log.info(f"Available audio devices: {devices}")
+        
+        # Try to find a default input device
+        default_input_device_info = sd.query_devices(kind='input')
+        log.info(f"Default input device info: {default_input_device_info}")
+
+        # Attempt to open the input stream
         with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, dtype='float32', blocksize=CHUNK_SIZE) as stream:
+            log.info(f"Audio input stream opened with sample rate: {stream.samplerate}, channels: {stream.channels}")
             while is_recording:
                 audio_chunk, overflowed = stream.read(CHUNK_SIZE)
                 if overflowed:
@@ -405,4 +415,4 @@ if __name__ == '__main__':
     load_script_cues()
     
     # Run the Flask-SocketIO server
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=2000, debug=False)

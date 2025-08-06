@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     gcc \
     g++ \
+    libgirepository1.0-dev \
+    gir1.2-gst-plugins-base-1.0 \
+    libasound2-dev \
+    libcairo2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
