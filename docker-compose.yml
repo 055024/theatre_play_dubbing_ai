@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: theatre_dubbing_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./audio:/app/audio
+      - ./script_cues.json:/app/script_cues.json
+      - /dev/snd:/dev/snd  # Audio device access
+    devices:
+      - /dev/snd:/dev/snd  # Audio device access
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=production
+    restart: unless-stopped
+    networks:
+      - theatre_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: theatre_dubbing_frontend
+    ports:
+      - "1999:3000"  # Expose on port 1999 as requested
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    restart: unless-stopped
+    networks:
+      - theatre_network
+
+  # Optional: Redis for session management (if needed in future)
+  # redis:
+  #   image: redis:alpine
+  #   container_name: theatre_dubbing_redis
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+  #   networks:
+  #     - theatre_network
+
+networks:
+  theatre_network:
+    driver: bridge
+
+volumes:
+  audio_data:
+    driver: local
